@@ -1,0 +1,79 @@
+{
+  "name": "avchub-studio",
+  "version": "0.1.0",
+  "description": "Self-hosted control plane for AI video production: an exactly-once job ledger, a documented remote-worker protocol, TTS narration, subtitle alignment and FFmpeg assembly, with pluggable providers.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "private": false,
+  "homepage": "https://github.com/avchub/avchub-studio",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avchub/avchub-studio.git"
+  },
+  "bugs": {
+    "url": "https://github.com/avchub/avchub-studio/issues"
+  },
+  "keywords": [
+    "self-hosted",
+    "control-plane",
+    "video",
+    "ffmpeg",
+    "orchestration",
+    "postgresql",
+    "job-queue",
+    "tts",
+    "subtitles",
+    "worker",
+    "exactly-once"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "test": "node tests/run-tests.mjs",
+    "control-plane:dev": "node control-plane/src/main.mjs",
+    "control-plane:start": "node control-plane/src/main.mjs",
+    "control-plane:check-config": "node control-plane/src/main.mjs check-config",
+    "control-plane:db:migrate": "node control-plane/src/persistence/postgres/cli.mjs migrate",
+    "control-plane:db:status": "node control-plane/src/persistence/postgres/cli.mjs status",
+    "control-plane:db:validate": "node control-plane/src/persistence/postgres/cli.mjs validate",
+    "control-plane:db:reset:test": "node control-plane/src/persistence/postgres/cli.mjs reset-test",
+    "control-plane:processor:once": "node control-plane/src/processor/cli.mjs",
+    "control-plane:test": "node tests/step5c2-control-plane-postgres-tests.mjs",
+    "test-protocol": "node tests/protocol-tests.mjs",
+    "test-recovery": "node tests/recovery-journal-tests.mjs",
+    "test-step5c2": "node tests/step5c2-control-plane-postgres-tests.mjs",
+    "test-step5c3": "node tests/step5c3-control-plane-processor-tests.mjs",
+    "test-step5c4": "node tests/step5c4-control-plane-websocket-gateway-tests.mjs",
+    "test-step5c5": "node tests/step5c5-control-plane-pairing-tests.mjs",
+    "test-step5c6": "node tests/step5c6-control-plane-project-job-api-tests.mjs",
+    "test-step5c10": "node tests/step5c10-story-scene-tests.mjs && node tests/step5c10-assembler-tests.mjs && node tests/step5c10-movie-control-plane-tests.mjs",
+    "test-step5c11": "node tests/step5c11-audio-render-tests.mjs && node tests/step5c11-content-libs-tests.mjs && node tests/step5c11-content-control-plane-tests.mjs",
+    "test-step5c12": "node tests/step5c12-ops-libs-tests.mjs && node tests/step5c12-backup-restore-tests.mjs && node tests/step5c12-crash-recovery-tests.mjs && node tests/step5c12-load-soak-tests.mjs",
+    "test-step5c21": "node tests/step5c21-auth-crypto-tests.mjs && node tests/step5c21-auth-service-unit-tests.mjs && node tests/step5c21-auth-repository-tests.mjs && node tests/step5c21-auth-service-tests.mjs && node tests/step5c21-auth-mfa-tests.mjs && node tests/step5c21-auth-onboarding-tests.mjs && node tests/step5c21-auth-rls-cert-tests.mjs",
+    "test-step5c22": "node tests/step5c22-auth-http-tests.mjs && node tests/step5c22-auth-enforcement-tests.mjs && node tests/step5c22-runtime-enforcement-tests.mjs && node tests/step5c22-auth-http-integration-tests.mjs",
+    "test-step5c26": "node tests/step5c26-movie-pipeline-tests.mjs",
+    "worker-pair-serve-local": "node scripts/worker-pairing-local.mjs serve",
+    "worker-pair-code-local": "node scripts/worker-pairing-local.mjs code",
+    "worker-pair-local": "node scripts/worker-pairing-local.mjs pair",
+    "worker-list-local": "node scripts/worker-pairing-local.mjs list",
+    "worker-rotate-local": "node scripts/worker-pairing-local.mjs rotate",
+    "worker-revoke-local": "node scripts/worker-pairing-local.mjs revoke",
+    "worker-control-local": "node scripts/worker-control-local.mjs",
+    "worker-connect-local": "node scripts/worker-connect-local.mjs",
+    "demo:seed": "node scripts/demo/seed-demo.mjs",
+    "lint": "node scripts/dev/lint.mjs",
+    "typecheck": "node scripts/dev/typecheck.mjs",
+    "build": "node scripts/dev/build.mjs",
+    "scan:secrets": "node scripts/dev/scan-secrets.mjs",
+    "licenses": "node scripts/ops/license-audit.mjs"
+  },
+  "dependencies": {
+    "@node-rs/argon2": "^2.0.2",
+    "pg": "^8.22.0",
+    "ws": "^8.21.0"
+  },
+  "devDependencies": {
+    "playwright-core": "1.61.1"
+  }
+}

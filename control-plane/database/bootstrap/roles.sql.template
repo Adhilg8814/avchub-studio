@@ -1,0 +1,36 @@
+-- P0 Step 5C.2 — role bootstrap TEMPLATE (run once by a DBA/superuser, before migrating).
+-- Contains NO real passwords: pass them as psql variables, e.g.
+--   psql -v migrator_password="$CP_MIGRATOR_PW" \
+--        -v tenant_password="$CP_TENANT_PW" \
+--        -v ops_password="$CP_OPS_PW" \
+--        -v observer_password="$CP_OBSERVER_PW" \
+--        -f control-plane/database/bootstrap/roles.sql.template
+--
+-- Role model (docs/control-plane-architecture.md §3.3.1). BYPASSRLS is a ROLE ATTRIBUTE, not
+-- a table-scoped privilege — only cp_ops_enumerator has it, and it is contained by SELECT-only
+-- minimal GRANTs (see 0010) and a separate connection pool that never applies business state.
+
+\set ON_ERROR_STOP on
+
+-- cp_migrator: owns/applies schema; NOT used by the running service. NOBYPASSRLS.
+CREATE ROLE cp_migrator LOGIN PASSWORD :'migrator_password'
+  NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS NOINHERIT;
+
+-- cp_tenant_app: runtime business pool. NOBYPASSRLS (RLS always applies).
+CREATE ROLE cp_tenant_app LOGIN PASSWORD :'tenant_password'
+  NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS NOINHERIT;
+
+-- cp_ops_enumerator: runtime ops enumeration pool. BYPASSRLS (cross-workspace scans), but
+-- SELECT-only minimal grants (0010) mean it can only read approved protocol/sweep tables.
+CREATE ROLE cp_ops_enumerator LOGIN PASSWORD :'ops_password'
+  NOSUPERUSER NOCREATEDB NOCREATEROLE BYPASSRLS NOINHERIT;
+
+-- cp_readonly_observer: sanitized health/metrics reads only.
+CREATE ROLE cp_readonly_observer LOGIN PASSWORD :'observer_password'
+  NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS NOINHERIT;
+
+-- Ensure runtime roles cannot assume each other (NOINHERIT above + no role membership).
+-- Do NOT GRANT cp_ops_enumerator TO cp_tenant_app (or vice versa).
+
+-- Safe fixed per-role connection defaults (also re-applied per connection by pools.mjs).
+-- NOTE: run the database-scoped variants (ALTER ROLE ... IN DATABASE ...) from database.sql.template.

@@ -1,0 +1,48 @@
+{
+  "provider": "openai",
+  "model": "mock-model",
+  "outputDir": "tests/.tmp-out",
+  "language": "Bulgarian",
+  "storiesPerSeed": 1,
+  "minWords": 400,
+  "maxWords": 900,
+  "temperature": 0.9,
+  "maxOutputTokens": 4000,
+  "retries": 0,
+  "requestTimeoutMs": 10000,
+  "sectionedGeneration": true,
+  "sectionRetries": 1,
+  "expandAttempts": 2,
+  "concurrency": 2,
+  "seedGeneration": {
+    "enabled": false,
+    "count": 2,
+    "batchSize": 2
+  },
+  "seeds": [
+    {
+      "slug": "ok-seed",
+      "openingQuote": "Защо скри това от мен?",
+      "premise": "Testova premise za istoriya edno.",
+      "twist": "Testov twist."
+    },
+    {
+      "slug": "fail-seed",
+      "openingQuote": "Чия е тази снимка?",
+      "premise": "Testova premise za istoriya dve.",
+      "twist": "Testov twist dve."
+    }
+  ],
+  "publishing": {
+    "siteDir": "tests/.tmp-site",
+    "draftsDir": "tests/.tmp-out/publishing",
+    "siteBaseUrl": "",
+    "siteTitle": "Test Site"
+  },
+  "mediaGeneration": {
+    "imagePromptsFile": "tests/.tmp-out/publishing/image-prompts.csv",
+    "imageOutputDir": "tests/.tmp-out/images",
+    "videoOutputDir": "tests/.tmp-out/videos",
+    "pythonPath": "python"
+  }
+}

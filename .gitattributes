@@ -1,0 +1,46 @@
+# Normalise line endings in the repository and check out platform-native.
+# This project is developed on Windows and tested on Linux in CI; without this, a CRLF file lands in a commit
+# and every later diff on that file is unreadable.
+* text=auto eol=lf
+
+# Windows-only tooling that must keep CRLF, because some shells refuse an LF-terminated script.
+*.ps1   text eol=crlf
+*.psm1  text eol=crlf
+*.cmd   text eol=crlf
+*.bat   text eol=crlf
+
+# Explicit text, so a stray byte never gets a file treated as binary.
+*.mjs   text
+*.js    text
+*.json  text
+*.sql   text
+*.md    text
+*.css   text
+*.html  text
+*.yml   text
+*.yaml  text
+*.py    text
+
+# Binary: never diffed, never line-ending converted, never merged.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.pdf   binary
+*.zip   binary
+*.gz    binary
+*.mp4   binary
+*.mp3   binary
+*.wav   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.exe   binary
+*.dll   binary
+
+# Keep generated and vendored material out of language statistics and collapsed in review.
+package-lock.json  linguist-generated=true -diff
+docs/THIRD_PARTY_NOTICES.md  linguist-generated=true
+control-plane/database/migrations/*.sql  linguist-language=SQL

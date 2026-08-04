@@ -1,0 +1,120 @@
+{
+  "_comment": "Example content presets. Country and genre entries are illustrative; facebookPages and referenceArticles are intentionally empty — supply your own.",
+  "countries": [
+    {
+      "id": "bulgaria",
+      "labelEn": "Bulgaria",
+      "language": "Bulgarian",
+      "siteTitle": "Bulgaria Stories",
+      "facebookCta": "Read the full story on our site.",
+      "facebookHashtags": [],
+      "facebookPages": [],
+      "referenceArticles": []
+    },
+    {
+      "id": "sweden",
+      "labelEn": "Sweden",
+      "language": "Swedish",
+      "siteTitle": "Sweden Stories",
+      "facebookCta": "Read the full story on our site.",
+      "facebookHashtags": [],
+      "facebookPages": [],
+      "referenceArticles": []
+    },
+    {
+      "id": "denmark",
+      "labelEn": "Denmark",
+      "language": "Danish",
+      "siteTitle": "Denmark Stories",
+      "facebookCta": "Read the full story on our site.",
+      "facebookHashtags": [],
+      "facebookPages": [],
+      "referenceArticles": []
+    },
+    {
+      "id": "united_states",
+      "labelEn": "United States",
+      "language": "English",
+      "siteTitle": "United States Stories",
+      "facebookCta": "Read the full story on our site.",
+      "facebookHashtags": [],
+      "facebookPages": [],
+      "referenceArticles": []
+    },
+    {
+      "id": "hungary",
+      "labelEn": "Hungary",
+      "language": "Hungarian",
+      "siteTitle": "Hungary Stories",
+      "facebookCta": "Read the full story on our site.",
+      "facebookHashtags": [],
+      "facebookPages": [],
+      "referenceArticles": []
+    }
+  ],
+  "genres": [
+    {
+      "id": "family_secrets",
+      "labelEn": "Family secrets",
+      "theme": "Family secrets, marriage conflict, betrayal, inheritance, hidden documents, security cameras, hospitals, banks, old promises, custody disputes, private messages, funeral secrets, property deeds, and workplace lies affecting family life.",
+      "globalStyle": "Original first-person emotional family drama for social media readers. Short paragraphs. Strong hook. Slow reveal. Domestic clues, believable family conflict, and a final twist that reinterprets earlier details.",
+      "avoid": "No supernatural plots. No graphic violence. No explicit sex. No real public figures. Do not copy existing article premises.",
+      "minWords": 1900,
+      "maxWords": 2600
+    },
+    {
+      "id": "inheritance_documents",
+      "labelEn": "Inheritance and documents",
+      "theme": "Inheritance disputes, forged documents, wills, bank statements, property deeds, notarized letters, hidden accounts, old family promises, and relatives fighting over money or a house.",
+      "globalStyle": "First-person suspense built around physical evidence. Focus on documents, signatures, dates, bank records, property records, and a family reveal that changes who deserves trust.",
+      "avoid": "No supernatural plots. No courtroom technical lectures. No copied article premises. No real public figures.",
+      "minWords": 1900,
+      "maxWords": 2700
+    },
+    {
+      "id": "divorce_ex_family",
+      "labelEn": "Divorce and ex-family conflict",
+      "theme": "Divorce, ex-husband, ex-wife, ex-mother-in-law, blocked cards, rent payments, custody disputes, family pressure, old bank statements, and a confrontation at the door.",
+      "globalStyle": "Fast emotional first-person story with a sharp opening conflict, escalating confrontation, and a document or message that exposes why the ex-family is desperate.",
+      "avoid": "No explicit sex. No graphic violence. No real public figures. Do not copy the reference article plot or wording.",
+      "minWords": 1800,
+      "maxWords": 2600
+    },
+    {
+      "id": "parent_child_betrayal",
+      "labelEn": "Parent-child betrayal",
+      "theme": "Parents humiliating a child, siblings compared unfairly, graduation scenes, family microphones, birthday speeches, favoritism, hidden adoption records, and a painful truth revealed later.",
+      "globalStyle": "Emotional first-person family drama focused on shame, memory, silence, and a reveal that explains years of unfair treatment.",
+      "avoid": "No supernatural plots. No graphic abuse detail. No copied article premise. No real public figures.",
+      "minWords": 1900,
+      "maxWords": 2700
+    },
+    {
+      "id": "workplace_billionaire",
+      "labelEn": "Workplace and billionaire scandal",
+      "theme": "Workplace humiliation, rich spouse, employee accused unfairly, company party, private messages, HR emails, security footage, inheritance money, and a public accusation that backfires.",
+      "globalStyle": "Dramatic social-media fiction with a strong public humiliation hook, power imbalance, receipts, messages, and a twist that exposes the real manipulator.",
+      "avoid": "No explicit sex. No graphic violence. No real public figures or real companies. Keep every character fictional.",
+      "minWords": 1800,
+      "maxWords": 2500
+    },
+    {
+      "id": "football",
+      "labelEn": "Football",
+      "theme": "Football family drama, club pressure, player contracts, youth academy secrets, injury paperwork, transfer rumors, angry fans, family sacrifice, and a public accusation connected to a match.",
+      "globalStyle": "Fictional football-focused drama with match-day tension, family stakes, club politics, social-media pressure, and a document/message reveal. Use fictional clubs and players unless real-news mode is added later.",
+      "avoid": "Do not invent claims about real players, real clubs, or real matches. No graphic violence. No copied news article.",
+      "minWords": 1200,
+      "maxWords": 2200
+    },
+    {
+      "id": "news_human_interest",
+      "labelEn": "Human-interest news",
+      "theme": "Human-interest news style, neighborhood disputes, family conflict, public embarrassment, documents, community rumors, official-looking notices, and a surprising personal truth.",
+      "globalStyle": "News-like but fictional human-interest story. Keep the pacing clear, factual-sounding, and emotionally readable while avoiding real people or unverifiable claims.",
+      "avoid": "No real public figures. Do not present fiction as real news. No copied article premise.",
+      "minWords": 1000,
+      "maxWords": 2000
+    }
+  ]
+}

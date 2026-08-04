@@ -1,0 +1,16 @@
+name: Documentation
+description: Something is missing, wrong, or misleading in the docs
+labels: [documentation]
+body:
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      description: File or URL.
+    validations: { required: true }
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong
+      description: What the docs say, and what turned out to be true.
+    validations: { required: true }

@@ -1,0 +1,41 @@
+-- P0 Step 5C.2 — database bootstrap TEMPLATE (run once by a DBA/superuser, after roles.sql).
+-- No secrets. Pass the database name as a psql variable, e.g.
+--   psql -v db_name=controlplane -f control-plane/database/bootstrap/database.sql.template
+--
+-- Creates the database owned by cp_migrator, revokes PUBLIC, grants least privilege, and sets
+-- safe per-role connection defaults (timezone UTC, timeouts, search_path).
+
+\set ON_ERROR_STOP on
+
+-- Create the database owned by the migrator (idempotent guard).
+SELECT 'CREATE DATABASE ' || quote_ident(:'db_name') || ' OWNER cp_migrator'
+WHERE NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = :'db_name') \gexec
+
+\connect :db_name
+
+-- No implicit PUBLIC access to the database or schema.
+REVOKE ALL ON DATABASE :"db_name" FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+
+GRANT CONNECT ON DATABASE :"db_name" TO cp_migrator, cp_tenant_app, cp_ops_enumerator, cp_readonly_observer;
+
+-- Only the migrator may create objects; runtime roles only USE the schema.
+GRANT USAGE ON SCHEMA public TO cp_tenant_app, cp_ops_enumerator, cp_readonly_observer;
+GRANT CREATE, USAGE ON SCHEMA public TO cp_migrator;
+
+-- Safe per-role connection defaults (belt-and-suspenders; pools.mjs also sets these).
+DO $settings$
+DECLARE r text;
+BEGIN
+  FOREACH r IN ARRAY ARRAY['cp_migrator','cp_tenant_app','cp_ops_enumerator','cp_readonly_observer'] LOOP
+    EXECUTE format('ALTER ROLE %I IN DATABASE %I SET search_path = public', r, current_database());
+    EXECUTE format('ALTER ROLE %I IN DATABASE %I SET timezone = ''UTC''', r, current_database());
+    EXECUTE format('ALTER ROLE %I IN DATABASE %I SET lock_timeout = ''5s''', r, current_database());
+  END LOOP;
+  -- Runtime roles get tighter statement / idle-transaction timeouts.
+  FOREACH r IN ARRAY ARRAY['cp_tenant_app','cp_ops_enumerator','cp_readonly_observer'] LOOP
+    EXECUTE format('ALTER ROLE %I IN DATABASE %I SET statement_timeout = ''10s''', r, current_database());
+    EXECUTE format('ALTER ROLE %I IN DATABASE %I SET idle_in_transaction_session_timeout = ''15s''', r, current_database());
+  END LOOP;
+END
+$settings$;

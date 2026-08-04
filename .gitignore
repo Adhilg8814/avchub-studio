@@ -1,0 +1,68 @@
+# Dependencies
+node_modules/
+
+# Local environment — never commit a real one
+.env
+.env.*
+!.env.example
+
+# Runtime data: media, caches, credentials, databases. All of this belongs in AVC_STUDIO_HOME, which lives
+# OUTSIDE the working tree. These patterns are a second line of defence for the day someone points it inside.
+*-data/
+generated-media/
+/media/
+/renders/
+/packages-out/
+postgres-data/
+pgdata/
+provider-profiles/
+*.mdf
+*.ldf
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+*.bak
+
+# Credentials and key material, in any shape
+*.key
+*.pem
+*.pfx
+*.p12
+*.jks
+*.keystore
+*.crt
+*secret*.txt
+*token*.txt
+/credentials/
+.cloudflared/
+
+# Screenshots and captures — these have carried a logged-in session before
+/screenshots/
+/shots/
+/captures/
+
+# Build and test output
+dist/
+/build/
+/out/
+coverage/
+.nyc_output/
+tests/.tmp-out/
+tests/.tmp-video/
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# OS and editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*~

@@ -1,0 +1,101 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Read-only by default; no job here needs more, and nothing reads a repository secret.
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      # Deliberately not a full cross product. Both supported Node versions are covered, and both platforms
+      # are covered — Windows matters because the credential store is DPAPI and path handling differs — but
+      # three jobs is enough signal for a first release. Widen it when there is a reason to.
+      matrix:
+        include:
+          - { name: "ubuntu / node 20", os: ubuntu-latest, node: "20" }
+          - { name: "ubuntu / node 22", os: ubuntu-latest, node: "22" }
+          - { name: "windows / node 22", os: windows-latest, node: "22" }
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          # Keyed on package-lock.json, which is committed.
+          cache: npm
+
+      # Installs exactly the committed lockfile, and fails if package.json and the lockfile disagree.
+      - run: npm ci
+
+      # FFmpeg is not a dependency of this project — the operator installs it. Installing it explicitly on
+      # Linux means the media suites genuinely RUN on at least one platform instead of always skipping.
+      - name: Install FFmpeg (Linux only)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm test
+      - run: npm run test-protocol
+      - run: npm run test-recovery
+
+      # Exercises the media path on Linux, where FFmpeg was installed above. On Windows its media halves skip
+      # with a named reason and the pure halves still run, so the job is meaningful on both.
+      - run: npm run test-step5c10
+
+  secrets:
+    name: secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history, so the scan sees every commit rather than only the tip.
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      # No npm ci: the scanner uses only Node built-ins, by design, so no dependency can influence it.
+      - run: npm run scan:secrets
+
+  database:
+    name: database suites
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: avchub_studio_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      # A throwaway service container that lives only for this job. The database name must contain "_test":
+      # the suites refuse to run destructive tests against anything else.
+      # scan-secrets:allow ephemeral CI service container, not a real database
+      CONTROL_PLANE_TEST_DB_URL: postgres://postgres:postgres@127.0.0.1:5432/avchub_studio_test
+      CONTROL_PLANE_DB_ALLOW_DESTRUCTIVE_TESTS: "true"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run control-plane:db:migrate
+      - run: npm run control-plane:test
