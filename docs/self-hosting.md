@@ -27,17 +27,34 @@ npm install
 
 `npm install` pulls three runtime dependencies (`pg`, `ws`, `@node-rs/argon2`) and one development dependency.
 
-## 3. Create the database
+## 3. Create the roles and the database
 
-```sql
-CREATE DATABASE avc_studio;
-CREATE ROLE cp_tenant_app LOGIN PASSWORD 'choose-something-long';
-GRANT CONNECT ON DATABASE avc_studio TO cp_tenant_app;
+Run the two bootstrap templates once, as a superuser, **in this order**. All four roles must exist before the
+first migration: migration `0010` grants to `cp_tenant_app`, `cp_ops_enumerator` and `cp_readonly_observer`,
+and against a bare superuser database it fails with `undefined_object`.
+
+```bash
+psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
+  -v migrator_password="$CP_MIGRATOR_PW" \
+  -v tenant_password="$CP_TENANT_PW" \
+  -v ops_password="$CP_OPS_PW" \
+  -v observer_password="$CP_OBSERVER_PW" \
+  -f control-plane/database/bootstrap/roles.sql.template
+
+psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
+  -v db_name=avc_studio \
+  -f control-plane/database/bootstrap/database.sql.template
 ```
 
-`control-plane/database/bootstrap/roles.sql.template` defines the full role set — a migrator, an application
-role that does **not** bypass row-level security, an ops enumerator that does, and a read-only observer. For a
-single-operator install the application role alone is enough to start.
+The templates contain no passwords — you pass them as psql variables, so nothing secret is written to disk.
+
+The role split is the point, not ceremony. `cp_migrator` owns the schema and is **not** used by the running
+service. `cp_tenant_app` is the runtime pool and does **not** bypass row-level security, so a query that
+forgets a tenant filter returns nothing rather than someone else's rows. `cp_ops_enumerator` does bypass RLS
+for cross-workspace scans and is held to SELECT-only grants. `cp_readonly_observer` reads health and metrics.
+
+The exact same sequence runs in CI against a throwaway container — see `.github/workflows/ci.yml`, which is
+the copy that is actually executed on every push and therefore the one that cannot go stale.
 
 ## 4. Configure
 
@@ -68,10 +85,22 @@ directory inside the repository ends up in a commit or a `git clean` sooner or l
 
 ## 5. Migrate
 
+The migration credential is **command-only**: it is read from `CONTROL_PLANE_DB_MIGRATION_URL` by this CLI and
+nowhere else. The running service's config deliberately refuses to read it, so the process that serves requests
+never holds a credential that can alter the schema. Supply it for the command, not in `.env`:
+
 ```bash
-npm run control-plane:db:migrate
-npm run control-plane:db:status     # should report 44 applied, 0 pending
+# scan-secrets:allow documentation example; the password is a shell variable, not a value
+CONTROL_PLANE_DB_MIGRATION_URL="postgres://cp_migrator:$CP_MIGRATOR_PW@127.0.0.1:5432/avc_studio" \
+  npm run control-plane:db:migrate
+
+# scan-secrets:allow documentation example; the password is a shell variable, not a value
+CONTROL_PLANE_DB_MIGRATION_URL="postgres://cp_migrator:$CP_MIGRATOR_PW@127.0.0.1:5432/avc_studio" \
+  npm run control-plane:db:status     # state DATABASE_READY, applied == file count
 ```
+
+Without that variable the CLI stops with `MIGRATION_URL_NOT_SET` rather than falling back to the application
+connection — that refusal is the separation working, not a misconfiguration.
 
 Migrations are sequential and forward-only. `control-plane:db:validate` re-checks that what is in the database
 matches what the files say.
@@ -132,5 +161,6 @@ the sanitized summary with `npm run control-plane:check-config`.
 
 **Database suites skip** — that is the designed behaviour without `PGBIN`. A skip is not a failure.
 
-**The UI loads but shows nothing** — the API is on the same origin as the page. If you put it behind a proxy,
-the browser origin must appear in `CONTROL_PLANE_ALLOWED_ORIGINS`.
+**A browser client gets a CORS refusal** — the origin you serve must appear in
+`CONTROL_PLANE_ALLOWED_ORIGINS`. This release ships no web UI, so any browser client is one you wrote; it is
+subject to the same allowed-origins list as anything else.

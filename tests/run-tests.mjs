@@ -3,7 +3,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
-import { repoRoot, fromRoot, resolveFromRoot, toRecordPath } from "../lib/paths.mjs";
+import { repoRoot, fromRoot, resolveFromRoot, isAbsolutePath, toRecordPath } from "../lib/paths.mjs";
 import { parseArgs, numberOption, positiveIntOption } from "../lib/cli.mjs";
 import {
   stripBom, stripMetadata, parseMetadata, makeTitle, makeExcerpt,
@@ -48,7 +48,23 @@ function checkThrows(name, fn) {
 // ---------- paths ----------
 check("repoRoot is absolute", path.isAbsolute(repoRoot));
 check("fromRoot joins", fromRoot("output").endsWith("output"));
+// Absoluteness must be decided by BOTH platforms' rules, not by whichever one this process happens to be
+// running on. These ran green on Windows and red on Linux until resolveFromRoot stopped delegating to the
+// platform-default path.isAbsolute — a Windows path joined onto the repo root becomes a path that exists
+// nowhere, and nothing downstream notices until a file is missing.
 check("resolveFromRoot keeps absolute", resolveFromRoot("C:\\x\\y.txt"), "C:\\x\\y.txt");
+check("resolveFromRoot keeps a windows drive path with forward slashes", resolveFromRoot("C:/x/y.txt"), "C:/x/y.txt");
+check("resolveFromRoot keeps a lowercase drive letter", resolveFromRoot("d:\\media\\clip.mp4"), "d:\\media\\clip.mp4");
+check("resolveFromRoot keeps a UNC share", resolveFromRoot("\\\\server\\share\\clip.mp4"), "\\\\server\\share\\clip.mp4");
+check("resolveFromRoot keeps a posix absolute", resolveFromRoot("/var/media/clip.mp4"), "/var/media/clip.mp4");
+// Relative behaviour must not change. A drive-RELATIVE path (no separator after the colon) is not absolute
+// on Windows either, so it still resolves against the root.
+check("resolveFromRoot joins a relative path", resolveFromRoot("output/a.md"), path.join(repoRoot, "output/a.md"));
+check("resolveFromRoot joins a drive-relative path", resolveFromRoot("C:x.txt"), path.join(repoRoot, "C:x.txt"));
+check("resolveFromRoot empty gives the root", resolveFromRoot("   "), repoRoot);
+check("isAbsolutePath agrees on both rule sets",
+  [isAbsolutePath("C:\\x"), isAbsolutePath("/x"), isAbsolutePath("\\\\s\\h"), isAbsolutePath("x"), isAbsolutePath("C:x")].join(","),
+  "true,true,true,false,false");
 check("toRecordPath posix-relative", toRecordPath(fromRoot("output", "a.md")), "output/a.md");
 
 // ---------- cli ----------

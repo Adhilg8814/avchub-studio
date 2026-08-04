@@ -78,15 +78,17 @@ jobs:
         image: postgres:16
         env:
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: avchub_studio_test
         ports: ["5432:5432"]
         options: >-
           --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     env:
-      # A throwaway service container that lives only for this job. The database name must contain "_test":
-      # the suites refuse to run destructive tests against anything else.
+      # A throwaway service container that lives only for this job. The suites connect as cp_migrator, the
+      # role that owns the schema; the database name must contain "_test" or the safety guard refuses to run
+      # destructive tests against it at all.
       # scan-secrets:allow ephemeral CI service container, not a real database
-      CONTROL_PLANE_TEST_DB_URL: postgres://postgres:postgres@127.0.0.1:5432/avchub_studio_test
+      CONTROL_PLANE_TEST_DB_URL: postgres://cp_migrator:ci_migrator@127.0.0.1:5432/avchub_studio_test
+      # scan-secrets:allow ephemeral CI service container, not a real database
+      CONTROL_PLANE_DB_OPS_URL: postgres://cp_ops_enumerator:ci_ops@127.0.0.1:5432/avchub_studio_test
       CONTROL_PLANE_DB_ALLOW_DESTRUCTIVE_TESTS: "true"
     steps:
       - uses: actions/checkout@v4
@@ -97,5 +99,32 @@ jobs:
           node-version: "22"
           cache: npm
       - run: npm ci
-      - run: npm run control-plane:db:migrate
+
+      # Migration 0010 grants to cp_tenant_app, cp_ops_enumerator and cp_readonly_observer, so those roles
+      # must exist BEFORE the first migration runs — a bare superuser database fails at 0010 with
+      # "undefined_object". These are the project's own bootstrap templates, run in their documented order
+      # (roles, then database), which is also what a self-hoster does once by hand.
+      #
+      # The passwords are literals for a container that is destroyed when this job ends. They are not secrets
+      # and deliberately do not come from GitHub secrets: a public fork must be able to run this job.
+      - name: Bootstrap roles and database
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -v migrator_password=ci_migrator -v tenant_password=ci_tenant -v ops_password=ci_ops -v observer_password=ci_observer -f control-plane/database/bootstrap/roles.sql.template
+          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -v db_name=avchub_studio_test -f control-plane/database/bootstrap/database.sql.template
+
+      # The migration credential is deliberately NOT part of the running service's config — migrations are
+      # command-only and config.mjs refuses to read this variable. Setting it job-wide would defeat that
+      # separation, so it is scoped to this one step.
+      - name: Apply migrations (command-only credential)
+        env:
+          # scan-secrets:allow ephemeral CI service container, not a real database
+          CONTROL_PLANE_DB_MIGRATION_URL: postgres://cp_migrator:ci_migrator@127.0.0.1:5432/avchub_studio_test
+        run: |
+          npm run control-plane:db:migrate
+          npm run control-plane:db:status
+
+      # With a reachable database the suites RUN rather than skip; they fall back to the test URL for
+      # migration and ops connections that are not set explicitly.
       - run: npm run control-plane:test

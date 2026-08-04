@@ -195,10 +195,14 @@ internal history is not carried across and is not published: it contains operati
 machine paths and account identifiers — that has no place in a public repository, and rewriting it selectively
 would be less trustworthy than starting clean. The first commit here is therefore the whole history.
 
-The export was assembled from an explicit allow-list rather than by copying everything and deleting: 514 of
-953 tracked files. What was left behind is either private by design (browser-automation providers, account and
-proxy management), specific to one deployment (production tooling, runbooks, certification records), or
-superseded (a legacy pipeline and its desktop front-end).
+This repository is a sanitized, independently buildable open-source snapshot selected from a larger private
+codebase. It was assembled from an explicit allow-list — copying in what belongs here, rather than copying
+everything and deleting — so anything not listed simply never arrives.
+
+What stayed behind is private by design (the provider integrations and the account, proxy and credential
+management around them), specific to one deployment (its operational tooling and runbooks), or superseded.
+Nothing here depends on any of it: the tree builds, tests and runs its demo on its own, which is the property
+that matters and the one CI checks on every commit.
 
 ## License
 

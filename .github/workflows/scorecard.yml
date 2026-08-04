@@ -13,6 +13,11 @@ jobs:
   analysis:
     name: Scorecard analysis
     runs-on: ubuntu-latest
+    # Scorecard reads the repository through the public GitHub API, so on a private repository it fails with
+    # "repository not found" — a red run that says nothing about the code. Gated on visibility rather than
+    # deleted: the moment this repository becomes public the condition is true and the job runs itself, with
+    # no edit needed. While private the job is SKIPPED, which is neutral, not a failure.
+    if: github.event.repository.visibility == 'public'
     permissions:
       security-events: write
       id-token: write

@@ -238,7 +238,11 @@ async function runLiveTests(live) {
     // citext extension needed by users.email (0001 also creates it; belt-and-suspenders).
     try { await mc.query("CREATE EXTENSION IF NOT EXISTS citext"); } catch { /* may already exist */ }
     const res = await mrun(mc, { dir: MIG_DIR, appVersion: "test" });
-    check("LIVE A.migrate applied 15", res.applied.length + res.alreadyApplied, 15);
+    // Asserted against the migration DIRECTORY, not a number written down when there were 15 files. A pinned
+    // count goes stale on the next migration and never checks the property that matters: after a migrate on a
+    // freshly dropped schema, every migration on disk is applied and none is left behind.
+    const migrationFileCount = readdirSync(MIG_DIR).filter((f) => /^\d{4}_.+\.sql$/.test(f)).length;
+    check("LIVE A.migrate applies every migration on disk", res.applied.length + res.alreadyApplied, migrationFileCount);
     const st = await mstatus(mc, MIG_DIR);
     check("LIVE A.schema DATABASE_READY", st.state, SCHEMA_STATES.DATABASE_READY);
     // idempotent re-run
