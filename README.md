@@ -190,19 +190,18 @@ Please report vulnerabilities privately as described in [`SECURITY.md`](SECURITY
 
 ## Provenance
 
-This repository is a public export prepared from an internal source snapshot dated **2026-08-03**. The
-internal history is not carried across and is not published: it contains operational detail — hostnames,
-machine paths and account identifiers — that has no place in a public repository, and rewriting it selectively
-would be less trustworthy than starting clean. The first commit here is therefore the whole history.
+This repository began as a sanitized, independently buildable snapshot of a larger private codebase. The
+earlier private history was deliberately not imported: it records deployment-specific operational detail that
+has no place in a public repository, and rewriting it selectively would be less trustworthy than starting
+clean. Development from that first public commit onward is carried out here normally, in the open.
 
-This repository is a sanitized, independently buildable open-source snapshot selected from a larger private
-codebase. It was assembled from an explicit allow-list — copying in what belongs here, rather than copying
-everything and deleting — so anything not listed simply never arrives.
+The snapshot was assembled from an explicit allow-list — copying in what belongs here, rather than copying
+everything and then deleting — so anything not on the list never arrived in the first place. What stayed
+behind is private by design (the provider integrations and the account, proxy and credential management around
+them), specific to one deployment (its operational tooling and runbooks), or superseded.
 
-What stayed behind is private by design (the provider integrations and the account, proxy and credential
-management around them), specific to one deployment (its operational tooling and runbooks), or superseded.
-Nothing here depends on any of it: the tree builds, tests and runs its demo on its own, which is the property
-that matters and the one CI checks on every commit.
+Nothing here depends on any of it. The tree builds, tests and runs its demo on its own, which is the property
+that actually matters — and the one CI verifies on every commit.
 
 ## License
 
